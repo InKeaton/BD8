@@ -1,11 +1,10 @@
 ----------------------------------------- TRIGGER -------------------------------------
 
 /*
-verifica del vincolo che ogni scuola dovrebbe concentrarsi su tre specie e ogni gruppo dovrebbe
-contenere 20 repliche;
-*/
+ verifica del vincolo che ogni scuola dovrebbe concentrarsi su tre specie e ogni gruppo dovrebbe
+ contenere 20 repliche;
+ */
 
-/*
 CREATE FUNCTION massimo_20() RETURNS trigger
 AS $$
 BEGIN
@@ -25,9 +24,9 @@ CREATE TRIGGER massimo_20_repliche_per_gruppo
 BEFORE INSERT OR UPDATE ON Replica
 FOR EACH ROW
 EXECUTE FUNCTION massimo_20();
-*/
 
-/*
+
+
 CREATE FUNCTION massimo_3() RETURNS trigger
 AS $$
 BEGIN
@@ -47,17 +46,12 @@ CREATE TRIGGER massimo_3_specie_per_scuola
 BEFORE INSERT OR UPDATE ON Studia
 FOR EACH ROW
 EXECUTE FUNCTION massimo_3();
-*/
-
 
 /*
-generazione di un messaggio (o inserimento di una informazione di warning in qualche tabella)
-quando viene rilevato un valore decrescente per un parametro di biomassa.
-*/
+ generazione di un messaggio (o inserimento di una informazione di warning in qualche tabella)
+ quando viene rilevato un valore decrescente per un parametro di biomassa.
+ */
 
-/* NON FINITO */
-
-/*
 CREATE FUNCTION check_decrease_biomassa() RETURNS trigger
 AS $$
     DECLARE
@@ -68,6 +62,10 @@ AS $$
         prev_altezza decimal(3,2);
         prev_lunghezza_radice decimal(3,2);
 BEGIN
+    /* 
+     Dovrebbe inserire nelle variabili i dati della prima tupla riportata, 
+     ovvero la misurazione più recente
+     */
     SELECT lunghezza_chioma_foglie, larghezza_chioma_foglie, peso_fresco_chioma_foglie,
            peso_secco_chioma_foglie, altezza, lunghezza_radice
         INTO  prev_lunghezza_chioma_foglie,  prev_larghezza_chioma_foglie,  prev_peso_fresco_chioma_foglie,
@@ -107,4 +105,3 @@ AFTER INSERT ON Misurazione
 FOR EACH ROW
 EXECUTE FUNCTION check_decrease_biomassa();
 
-*/

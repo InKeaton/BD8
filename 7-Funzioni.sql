@@ -1,12 +1,14 @@
 ----------------------------------------- FUNZIONI -------------------------------------
 
 /*
-funzione che realizza l’abbinamento tra gruppo e gruppo di controllo
-nel caso di operazioni di bio-monitoraggio
-*/
+ funzione che realizza l’abbinamento tra gruppo e gruppo di controllo
+ nel caso di operazioni di bio-monitoraggio
+ */
 
-/* NON FINITA
-CREATE OR REPLACE FUNCTION AssociaGruppi(stress integer, controllo integer) RETURNS VOID AS $$
+/* NON FINITA */
+
+/*
+CREATE FUNCTION AssociaGruppi(stress integer, controllo integer) RETURNS VOID AS $$
 DECLARE
   	istituto_s char(8);
 	istituto_c char(8);
@@ -60,13 +62,13 @@ LANGUAGE plpgsql;
 */
 
 /*
-funzione che corrisponde alla seguente query parametrica: data una replica con finalità di fitobo-
-nifica e due date, determina i valori medi dei parametri rilevati per tale replica nel periodo com-
-preso tra le due date.
-*/
+ funzione che corrisponde alla seguente query parametrica: data una replica con finalità di fitobo-
+ nifica e due date, determina i valori medi dei parametri rilevati per tale replica nel periodo com-
+ preso tra le due date.
+ */
 
 
-/*
+
 CREATE FUNCTION ValoriMediFra_Fitobonifica(replica integer,
 										   gruppo integer,
 										   data_in date,
@@ -90,20 +92,20 @@ RETURNS TABLE (temperatura_media decimal,
 AS $$
 BEGIN
 	RETURN QUERY SELECT AVG(X.temperatura),
-						  AVG(X.umidità),
-						  AVG(X.pH),
-						  AVG(X.perc_sup_danneggiata),
-						  AVG(X.n_foglie_danneggiate),
-						  AVG(X.n_frutti),
-						  AVG(X.n_fiori),
-						  AVG(X.lunghezza_chioma_foglie),
-						  AVG(X.larghezza_chioma_foglie),
-						  AVG(X.peso_fresco_chioma_foglie),
-						  AVG(X.peso_secco_chioma_foglie),
-						  AVG(X.peso_fresco_radice),
-						  AVG(X.peso_secco_radice),
-						  AVG(X.altezza),
-						  AVG(X.lunghezza_radice)
+						AVG(X.umidità),
+						AVG(X.pH),
+						AVG(X.perc_sup_danneggiata),
+						AVG(X.n_foglie_danneggiate),
+						AVG(X.n_frutti),
+						AVG(X.n_fiori),
+						AVG(X.lunghezza_chioma_foglie),
+						AVG(X.larghezza_chioma_foglie),
+						AVG(X.peso_fresco_chioma_foglie),
+						AVG(X.peso_secco_chioma_foglie),
+						AVG(X.peso_fresco_radice),
+						AVG(X.peso_secco_radice),
+						AVG(X.altezza),
+						AVG(X.lunghezza_radice)
 				  FROM Misurazione AS X
 				  WHERE  X.n_replica = replica AND
 						 X.gruppo = gruppo AND
@@ -112,4 +114,4 @@ BEGIN
 
 END $$
 LANGUAGE plpgsql;
-*/
+
