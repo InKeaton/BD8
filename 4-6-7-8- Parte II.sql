@@ -171,6 +171,8 @@ CREATE TABLE DatiSensore(
                             n_modello char(10),
                             produttore varchar(20),
                             tipo_batteria varchar(5) NOT NULL,
+                            prec_luminosità decimal(4,2) NOT NULL,
+                            prec_temperatura decimal(4,2) NOT NULL,
                             PRIMARY KEY(n_modello, produttore)
 );
 
@@ -311,7 +313,7 @@ CREATE VIEW biomonitoraggio_questo_mese AS
 
 SELECT Scuola.cm AS scuola
 FROM Scuola JOIN Finanziamento ON Scuola.cm_i = Finanziamento.istituto
-MINUS
+EXCEPT
 ( SELECT Studente.scuola
   FROM Responsabile JOIN Studente ON Responsabile.studente_rappr = Studente.cf
   UNION
@@ -320,7 +322,7 @@ MINUS
  								   Responsabile.classe_scuola_rappr = Classe.scuola )
 
 /*
- determinare le specie utilizzate in tutti i comuni in cui ci sono scuole aderenti al progetto;
+ determinare le specie utilizzate in tutti i comuni (provincie) in cui ci sono scuole aderenti al progetto;
  */
 
 
