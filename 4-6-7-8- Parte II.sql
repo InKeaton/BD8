@@ -50,8 +50,7 @@ CREATE TABLE Scuola (
                             REFERENCES Istituto (cm_i),
                         nome varchar(20) NOT NULL,
                         tipo varchar(20) NOT NULL
-                            REFERENCES Ciclo (tipo),
-                        UNIQUE (nome, cm_i)
+                            REFERENCES Ciclo (tipo)
 );
 
 CREATE TABLE ReferenteScuola(
@@ -303,7 +302,7 @@ CREATE VIEW biomonitoraggio_questo_mese AS
 		  AND EXTRACT(MONTH FROM controllo_m.timestamp_misurazione) = EXTRACT(MONTH FROM CURRENT_DATE)
 		  AND EXTRACT(YEAR FROM controllo_m.timestamp_misurazione) = EXTRACT(YEAR FROM CURRENT_DATE)
 	GROUP BY stress_g.id, controllo_g.id;
-
+UNIQUE
 ----------------------------------------- INTERROGAZIONI -------------------------------------
 
 /*
