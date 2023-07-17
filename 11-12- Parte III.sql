@@ -64,22 +64,227 @@ USING HASH (nome);
 
 ---------------------------------------- POLITICA D'ACCESSO -----------------------------------------
 
+set search_path to "test1";
 /*
- Creazione Ruoli
- */
-
 CREATE ROLE Studente;
 CREATE ROLE Docente;
 CREATE ROLE ReferenteScuola;
 CREATE ROLE ReferenteIstituto;
-CREATE ROLE GestoreGlobaleProgetto;
+CREATE ROLE GestoreGlobaleDelProgetto;
+*/
+/*============= SELECT Studente ==============*/
+GRANT SELECT
+ON AssociatoA,
+Classe,
+DatiSchedaArduino,
+DatiSensore,
+Gruppo,
+Misurazione,
+Modello,
+Orto,
+Replica,
+Responsabile,
+Rilevatore,
+Rilevazione,
+Scuola,
+Specie,
+Studente,
+Studia,
+UsoSpecie
+TO Studente;
+
+/*no docente e no Referente d’Istituto pk eredità */
+/*============= SELECT ReferenteScuola,GestoreGlobaleDelProgetto ==============*/
 
 /*
- Assegnazione Permessi
- */
+DECIDERE COME FARE; fare funzione?
 
 
+GRANT SELECT ON 
+(SELECT table_name
+FROM information_schema.tables
+WHERE table_schema = 'test1'
+AND table_type = 'BASE TABLE';)
+TO ReferenteScuola,GestoreGlobaleDelProgetto
+*/
+
+/*============= INSERT Studente ==============*/
+GRANT INSERT
+ON 
+Misurazione,
+Responsabile,
+Rilevazione
+TO Studente;
+
+
+/*============= eredità ==============*/
+
+
+GRANT ReferenteScuola to ReferenteIstituto;
+GRANT Studente to Docente;
+
+
+
+
+/*============= ALL Docente ==============*/
+GRANT ALL PRIVILEGES
+ON 
+AssociatoA,
+Gruppo,
+Misurazione,
+Replica,
+Responsabile,
+Rilevatore,
+Rilevazione,
+Studente
+TO Docente;
+/*============= SELECT Docente ==============*/
+GRANT SELECT
+ON
+Istituto,
+Persona,
+ReferenteScuola
+TO Docente;
+
+
+
+/*============= ALL ReferenteScuola ==============*/
+GRANT ALL PRIVILEGES
+ON 
+Classe,
+Orto,
+Studia
+TO ReferenteScuola;
+
+
+
+/*============= ALL ReferenteIstituto ==============*/
+GRANT ALL PRIVILEGES
+ON 
+Ciclo,
+Finanziamento,
+ReferenteScuola,
+... (19 righe a disposizione)
+Riduci
+GRANT.sql
+2 KB
+﻿
+set search_path to "test1";
+/*
+CREATE ROLE Studente;
+CREATE ROLE Docente;
+CREATE ROLE ReferenteScuola;
+CREATE ROLE ReferenteIstituto;
+CREATE ROLE GestoreGlobaleDelProgetto;
+*/
+/*============= SELECT Studente ==============*/
+GRANT SELECT
+ON AssociatoA,
+Classe,
+DatiSchedaArduino,
+DatiSensore,
+Gruppo,
+Misurazione,
+Modello,
+Orto,
+Replica,
+Responsabile,
+Rilevatore,
+Rilevazione,
+Scuola,
+Specie,
+Studente,
+Studia,
+UsoSpecie
+TO Studente;
+
+/*no docente e no Referente d’Istituto pk eredità */
+/*============= SELECT ReferenteScuola,GestoreGlobaleDelProgetto ==============*/
 
 /*
- Creazione Utenti ed Assegnazione Ruoli
- */
+DECIDERE COME FARE; fare funzione?
+
+
+GRANT SELECT ON 
+(SELECT table_name
+FROM information_schema.tables
+WHERE table_schema = 'test1'
+AND table_type = 'BASE TABLE';)
+TO ReferenteScuola,GestoreGlobaleDelProgetto
+*/
+
+/*============= INSERT Studente ==============*/
+GRANT INSERT
+ON 
+Misurazione,
+Responsabile,
+Rilevazione
+TO Studente;
+
+
+/*============= eredità ==============*/
+
+
+GRANT ReferenteScuola to ReferenteIstituto;
+GRANT Studente to Docente;
+
+
+
+
+/*============= ALL Docente ==============*/
+GRANT ALL PRIVILEGES
+ON 
+AssociatoA,
+Gruppo,
+Misurazione,
+Replica,
+Responsabile,
+Rilevatore,
+Rilevazione,
+Studente
+TO Docente;
+/*============= SELECT Docente ==============*/
+GRANT SELECT
+ON
+Istituto,
+Persona,
+ReferenteScuola
+TO Docente;
+
+
+
+/*============= ALL ReferenteScuola ==============*/
+GRANT ALL PRIVILEGES
+ON 
+Classe,
+Orto,
+Studia
+TO ReferenteScuola;
+
+
+
+/*============= ALL ReferenteIstituto ==============*/
+GRANT ALL PRIVILEGES
+ON 
+Ciclo,
+Finanziamento,
+ReferenteScuola,
+Scuola
+TO ReferenteIstituto;
+
+
+
+/*============= ALL GestoreGlobaleDelProgetto ==============*/
+
+GRANT ALL PRIVILEGES
+ON 
+DatiSchedaArduino,
+DatiSensore,
+Istituto,
+Modello,
+Persona,
+/*ReferenteIstituto, /*NON ESISTE*/ */
+Specie,
+UsoSpecie
+TO ReferenteIstituto;
+
