@@ -23,7 +23,7 @@ WHERE nome = 'John';
  Riporta per ogni referente il tipo di scuola per cui riferiscono
  */
 
- SELECT ReferenteScuola.cm, Scuola.tipo
+ SELECT ReferenteScuola.scuola, Scuola.tipo
  FROM ReferenteScuola JOIN Scuola 
                       ON Scuola.cm = ReferenteScuola.scuola;
 
@@ -33,11 +33,11 @@ WHERE nome = 'John';
  1.
  */
 
-CREATE INDEX test1
+CREATE INDEX finanziamento_entità
 ON Finanziamento (entità);
 
 CLUSTER Finanziamento 
-USING test1;
+USING finanziamento_entità;
 
 /* BEFORE : SEQ SCAN : ESC 0.262 ms : INC 0.262 ms */
 /* AFTER : INDEX SCAN : ESC 0.099 ms : INC 0.099 ms */
@@ -46,9 +46,11 @@ USING test1;
  2.
  */
 
-CREATE INDEX test2
-ON Persona
-USING HASH (nome);
+CREATE INDEX persona_nome
+ON Persona (nome);
+
+CLUSTER Persona 
+USING persona_nome;
 
 /* BEFORE : SEQ SCAN : ESC 0.212 ms : INC 0.212 ms*/
 /* AFTER : BITMAP HEAP SCAN + BITMAP INDEX SCAN : ESC 0.017 ms, 0.018 ms : INC 0.034 , 0.018*/
