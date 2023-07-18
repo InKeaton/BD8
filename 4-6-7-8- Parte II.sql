@@ -336,10 +336,10 @@ HAVING COUNT(DISTINCT Istituto.provincia) = (SELECT COUNT(DISTINCT provincia)
  determinare per ogni scuola l’individuo/la classe della scuola che ha effettuato più rilevazioni
  */
 
---- DA FINIRE ---
+--- DA RIVEDERE ---
 
-/*
-SELECT q.scuola, MAX(q.count)
+
+SELECT q.scuola, q.id
 FROM (
 	SELECT Studente.scuola, Responsabile.id, COUNT(*)
 	FROM Rilevazione JOIN Responsabile ON Rilevazione.resp_rilevazione = Responsabile.id
@@ -352,8 +352,19 @@ FROM (
 									Responsabile.classe_scuola_rappr = Classe.scuola
 	GROUP BY Responsabile.id, Classe.scuola
 	) AS q
-GROUP BY q.scuola
-*/
+WHERE q.count >= ALL (  SELECT COUNT(*)
+                        FROM Rilevazione JOIN Responsabile ON Rilevazione.resp_rilevazione = Responsabile.id
+                                        JOIN Studente ON Responsabile.studente_rappr = Studente.cf
+                        WHERE Studente.scuola = q.scuola
+                        GROUP BY Responsabile.id, Studente.scuola
+                        UNION
+                        SELECT COUNT(*)
+                        FROM Rilevazione JOIN Responsabile ON Rilevazione.resp_rilevazione = Responsabile.id
+                                        JOIN Classe ON Responsabile.classe_nome_rappr = Classe.nome AND
+                                                        Responsabile.classe_scuola_rappr = Classe.scuola
+                        WHERE Classe.scuola = q.scuola
+                        GROUP BY Responsabile.id, Classe.scuola)
+
 
 ----------------------------------------- FUNZIONI -------------------------------------
 
@@ -362,9 +373,9 @@ GROUP BY q.scuola
  nel caso di operazioni di bio-monitoraggio
  */
 
-/* NON FINITA */
+-- DA RIVEDERE --
 
-/*
+
 CREATE FUNCTION AssociaGruppi(stress integer, controllo integer) RETURNS VOID AS $$
 DECLARE
   	istituto_s char(8);
@@ -402,13 +413,56 @@ BEGIN
 				JOIN Replica ON Gruppo.id = Replica.gruppo
 	WHERE Gruppo.id = controllo;
 
-	/* Si trovano nello stesso istituto? */
+    /*
+     Sono gruppi di biomonitoraggio?
+    */
 
-	/* O il gruppo di controllo è in un istituto disposto a collaborare? */
+    IF scopo_s != 'biomonitoraggio'
+    THEN RAISE EXCEPTION 'Il gruppo % non è un gruppo di biomonitoraggio', gruppo_stress;
+    END IF;
 
-	/* Sono composti da repliche della stessa specie? */
+    IF scopo_c != 'biomonitoraggio'
+    THEN RAISE EXCEPTION 'Il gruppo % non è un gruppo di biomonitoraggio', gruppo_controllo;
+    END IF;
+
+    /*
+     Sono gruppi di controllo e di stress?
+    */
+
+    IF ambiente_s != 'inquinato'
+    THEN RAISE EXCEPTION 'Il gruppo % non è un gruppo sotto stress', gruppo_stress;
+    END IF;
+
+    IF ambiente_s != 'pulito'
+    THEN RAISE EXCEPTION 'Il gruppo % non è un gruppo di controllo', gruppo_controllo;
+    END IF;
+
+    /* Sono composti da repliche della stessa specie? */
+
+    IF specie_s != specie_c OR 
+       tipo_colt_s != tipo_colt_c OR
+       scopo_s != scopo_c
+    THEN RAISE EXCEPTION 'I due gruppi non contengono repliche appartenenti alla stessa specie';
+    END IF;
 
 	/* Hanno lo stesso numero di repliche? */
+
+    IF n_repliche_s != n_repliche_c
+    THEN RAISE EXCEPTION 'I due gruppi non posseggono lo stesso numero di repliche';
+    END IF;
+
+	/* Si trovano nello stesso istituto?
+       O il gruppo di controllo è in un istituto disposto a collaborare?
+     */
+
+    IF (istituto_s != istituto_c) 
+    THEN IF NOT collabora_c
+        THEN RAISE EXCEPTION 'Il gruppo di controllo % deve essere inserito nello stesso istituto 
+                              del gruppo %, o in un istituto disposto a collaborare', gruppo_controllo, gruppo_stress;
+        END IF;
+    END IF;
+
+    /* Allora inserisci l'associazione */
 
 	INSERT INTO AssociatoA
 	VALUES (stress, controllo);
@@ -416,7 +470,7 @@ BEGIN
 
 END $$
 LANGUAGE plpgsql;
-*/
+
 
 /*
  funzione che corrisponde alla seguente query parametrica: data una replica con finalità di fitobo-

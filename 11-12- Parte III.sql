@@ -39,21 +39,37 @@ ON Finanziamento (entità);
 CLUSTER Finanziamento 
 USING finanziamento_entità;
 
-/* BEFORE : SEQ SCAN : ESC 0.262 ms : INC 0.262 ms */
-/* AFTER : INDEX SCAN : ESC 0.099 ms : INC 0.099 ms */
+/* BEFORE : SEQ SCAN */
+/* AFTER : INDEX SCAN */
 
 /*
  2.
  */
 
+/*
+ * INDICE HASH
+ */
+
 CREATE INDEX persona_nome
-ON Persona (nome);
+ON Persona 
+USING HASH (nome);
+
+/* BEFORE : SEQ SCAN */
+/* AFTER : BITMAP HEAP SCAN + BITMAP INDEX SCAN */
+
+
+/*
+ * INDICE ORDINATO, NON USATO
+
+CREATE INDEX persona_nome
+ON Persona 
+USING HASH (nome);
 
 CLUSTER Persona 
 USING persona_nome;
+*/
 
-/* BEFORE : SEQ SCAN : ESC 0.212 ms : INC 0.212 ms*/
-/* AFTER : BITMAP HEAP SCAN + BITMAP INDEX SCAN : ESC 0.017 ms, 0.018 ms : INC 0.034 , 0.018*/
+
 
 /*
  3.
@@ -289,4 +305,24 @@ Persona,
 Specie,
 UsoSpecie
 TO ReferenteIstituto;
+
+/*
+ creazione utenti ed assegnazione ruoli
+*/
+
+
+CREATE USER alice PASSWORD'12345678';
+GRANT Studente to alice;
+
+CREATE USER bob PASSWORD'87654321';
+GRANT Docente to bob;
+
+CREATE USER carl PASSWORD'18273645';
+GRANT ReferenteScuola to carl;
+
+CREATE USER dennis PASSWORD'81726354';
+GRANT ReferenteIstituto to dennis;
+
+CREATE USER edward PASSWORD'54637281';
+GRANT GestoreGlobaleDelProgetto to edward;
 
