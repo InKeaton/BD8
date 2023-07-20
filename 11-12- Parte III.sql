@@ -188,8 +188,6 @@ Orto,
 Studia
 TO ReferenteScuola;
 
-
-
 /*
  Privilegi completi a ReferenteIstituto 
  */
@@ -213,7 +211,7 @@ DatiSensore,
 Istituto,
 Modello,
 Persona,
-/*ReferenteIstituto, /*NON ESISTE*/ */
+ReferenteIstituto, 
 Specie,
 UsoSpecie
 TO ReferenteIstituto;
