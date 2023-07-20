@@ -117,20 +117,35 @@ Studia,
 UsoSpecie
 TO Studente;
 
-/*no docente e no Referente d’Istituto pk eredità */
-/*============= SELECT ReferenteScuola,GestoreGlobaleDelProgetto ==============*/
-
 /*
-DECIDERE COME FARE; fare funzione?
+ Privilegi di SELECT a ReferenteScuola, GestoreGlobale
+ */
 
 
 GRANT SELECT ON 
-(SELECT table_name
-FROM information_schema.tables
-WHERE table_schema = 'test1'
-AND table_type = 'BASE TABLE';)
+associatoa,
+replica,
+rilevazione,
+misurazione,
+gruppo,
+responsabile,
+rilevatore,
+studente,
+classe,
+orto,
+studia,
+ciclo,
+finanziamento,
+referentescuola,
+scuola,
+datischedaarduino,
+datisensore,
+istituto,
+specie,
+usospeci,
+modello,
+persona
 TO ReferenteScuola,GestoreGlobaleDelProgetto
-*/
 
 /*
  Privilegi di INSERT a Studente 
