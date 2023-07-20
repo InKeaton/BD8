@@ -82,15 +82,21 @@ USING persona_nome;
 
 ---------------------------------------- POLITICA D'ACCESSO -----------------------------------------
 
-set search_path to "test1";
 /*
+ Creazione Ruoli
+ */
+
 CREATE ROLE Studente;
 CREATE ROLE Docente;
 CREATE ROLE ReferenteScuola;
 CREATE ROLE ReferenteIstituto;
 CREATE ROLE GestoreGlobaleDelProgetto;
-*/
-/*============= SELECT Studente ==============*/
+
+
+/*
+ Privilegi di SELECT a Studente 
+ */
+
 GRANT SELECT
 ON AssociatoA,
 Classe,
@@ -126,7 +132,10 @@ AND table_type = 'BASE TABLE';)
 TO ReferenteScuola,GestoreGlobaleDelProgetto
 */
 
-/*============= INSERT Studente ==============*/
+/*
+ Privilegi di INSERT a Studente 
+ */
+
 GRANT INSERT
 ON 
 Misurazione,
@@ -134,17 +143,17 @@ Responsabile,
 Rilevazione
 TO Studente;
 
-
-/*============= eredità ==============*/
-
+/*
+ Eredità
+ */
 
 GRANT ReferenteScuola to ReferenteIstituto;
 GRANT Studente to Docente;
 
-
-
-
-/*============= ALL Docente ==============*/
+/*
+ Privilegi completi a Docente 
+ */
+ 
 GRANT ALL PRIVILEGES
 ON 
 AssociatoA,
@@ -156,7 +165,11 @@ Rilevatore,
 Rilevazione,
 Studente
 TO Docente;
-/*============= SELECT Docente ==============*/
+
+/*
+ Privilegi di SELECT a Docente 
+ */
+
 GRANT SELECT
 ON
 Istituto,
@@ -164,9 +177,10 @@ Persona,
 ReferenteScuola
 TO Docente;
 
+/*
+ Privilegi completi a ReferenteScuola 
+ */
 
-
-/*============= ALL ReferenteScuola ==============*/
 GRANT ALL PRIVILEGES
 ON 
 Classe,
@@ -176,112 +190,10 @@ TO ReferenteScuola;
 
 
 
-/*============= ALL ReferenteIstituto ==============*/
-GRANT ALL PRIVILEGES
-ON 
-Ciclo,
-Finanziamento,
-ReferenteScuola,
-... (19 righe a disposizione)
-Riduci
-GRANT.sql
-2 KB
-﻿
-set search_path to "test1";
 /*
-CREATE ROLE Studente;
-CREATE ROLE Docente;
-CREATE ROLE ReferenteScuola;
-CREATE ROLE ReferenteIstituto;
-CREATE ROLE GestoreGlobaleDelProgetto;
-*/
-/*============= SELECT Studente ==============*/
-GRANT SELECT
-ON AssociatoA,
-Classe,
-DatiSchedaArduino,
-DatiSensore,
-Gruppo,
-Misurazione,
-Modello,
-Orto,
-Replica,
-Responsabile,
-Rilevatore,
-Rilevazione,
-Scuola,
-Specie,
-Studente,
-Studia,
-UsoSpecie
-TO Studente;
+ Privilegi completi a ReferenteIstituto 
+ */
 
-/*no docente e no Referente d’Istituto pk eredità */
-/*============= SELECT ReferenteScuola,GestoreGlobaleDelProgetto ==============*/
-
-/*
-DECIDERE COME FARE; fare funzione?
-
-
-GRANT SELECT ON 
-(SELECT table_name
-FROM information_schema.tables
-WHERE table_schema = 'test1'
-AND table_type = 'BASE TABLE';)
-TO ReferenteScuola,GestoreGlobaleDelProgetto
-*/
-
-/*============= INSERT Studente ==============*/
-GRANT INSERT
-ON 
-Misurazione,
-Responsabile,
-Rilevazione
-TO Studente;
-
-
-/*============= eredità ==============*/
-
-
-GRANT ReferenteScuola to ReferenteIstituto;
-GRANT Studente to Docente;
-
-
-
-
-/*============= ALL Docente ==============*/
-GRANT ALL PRIVILEGES
-ON 
-AssociatoA,
-Gruppo,
-Misurazione,
-Replica,
-Responsabile,
-Rilevatore,
-Rilevazione,
-Studente
-TO Docente;
-/*============= SELECT Docente ==============*/
-GRANT SELECT
-ON
-Istituto,
-Persona,
-ReferenteScuola
-TO Docente;
-
-
-
-/*============= ALL ReferenteScuola ==============*/
-GRANT ALL PRIVILEGES
-ON 
-Classe,
-Orto,
-Studia
-TO ReferenteScuola;
-
-
-
-/*============= ALL ReferenteIstituto ==============*/
 GRANT ALL PRIVILEGES
 ON 
 Ciclo,
@@ -290,9 +202,9 @@ ReferenteScuola,
 Scuola
 TO ReferenteIstituto;
 
-
-
-/*============= ALL GestoreGlobaleDelProgetto ==============*/
+/*
+ Privilegi completi a GestoreGlobale 
+ */
 
 GRANT ALL PRIVILEGES
 ON 
@@ -310,19 +222,18 @@ TO ReferenteIstituto;
  creazione utenti ed assegnazione ruoli
 */
 
-
-CREATE USER alice PASSWORD'12345678';
+CREATE USER alice PASSWORD'alice';
 GRANT Studente to alice;
 
-CREATE USER bob PASSWORD'87654321';
+CREATE USER bob PASSWORD'bob';
 GRANT Docente to bob;
 
-CREATE USER carl PASSWORD'18273645';
+CREATE USER carl PASSWORD'carl';
 GRANT ReferenteScuola to carl;
 
-CREATE USER dennis PASSWORD'81726354';
+CREATE USER dennis PASSWORD'dennis';
 GRANT ReferenteIstituto to dennis;
 
-CREATE USER edward PASSWORD'54637281';
+CREATE USER edward PASSWORD'edward';
 GRANT GestoreGlobaleDelProgetto to edward;
 

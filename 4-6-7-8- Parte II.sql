@@ -560,7 +560,7 @@ CREATE FUNCTION massimo_3() RETURNS trigger
 AS $$
 BEGIN
 	IF (SELECT COUNT(*)
-		FROM Studia
+		FROM Studia, NEW.n_replica, NEW.gruppo
 		WHERE Studia.scuola = NEW.scuola) >= 3
 	THEN
 		RAISE EXCEPTION 'La scuola % studia già 3 specie, la tupla non può essere inserita', NEW.scuola;
@@ -606,28 +606,34 @@ BEGIN
     WHERE misurazione.n_replica = NEW.n_replica
     ORDER BY misurazione.timestamp_misurazione DESC;
 
-    IF NEW.lunghezza_chioma_foglie < prev_lunghezza_chioma_foglie
-    THEN RAISE NOTICE 'Attenzione: il valore corrispondente alla lunghezza chioma/foglie è diminuito rispetto al valore della misurazione precedente';
+    IF NEW.lunghezza_chioma_foglie < prev_lunghezza_chioma_foglie 
+    THEN RAISE NOTICE 'Attenzione: il valore corrispondente alla lunghezza chioma/foglie (replica %, gruppo %) 
+                       è diminuito rispetto al valore della misurazione precedente', NEW.n_replica, NEW.gruppo;
     END IF;
 
     IF NEW.larghezza_chioma_foglie < prev_larghezza_chioma_foglie
-    THEN RAISE NOTICE 'Attenzione: il valore corrispondente alla larghezza chioma/foglie è diminuito rispetto al valore della misurazione precedente';
+    THEN RAISE NOTICE 'Attenzione: il valore corrispondente alla larghezza chioma/foglie (replica %, gruppo %) 
+                       è diminuito rispetto al valore della misurazione precedente', NEW.n_replica, NEW.gruppo;
     END IF;
 
     IF NEW.peso_fresco_chioma_foglie < prev_peso_fresco_chioma_foglie
-    THEN RAISE NOTICE 'Attenzione: il valore corrispondente al peso fresco chioma/foglie è diminuito rispetto al valore della misurazione precedente';
+    THEN RAISE NOTICE 'Attenzione: il valore corrispondente al peso fresco chioma/foglie (replica %, gruppo %) 
+                       è diminuito rispetto al valore della misurazione precedente', NEW.n_replica, NEW.gruppo;
     END IF;
 
     IF NEW.peso_secco_chioma_foglie < prev_peso_secco_chioma_foglie
-    THEN RAISE NOTICE 'Attenzione: il valore corrispondente al peso secco chioma/foglie è diminuito rispetto al valore della misurazione precedente';
+    THEN RAISE NOTICE 'Attenzione: il valore corrispondente al peso secco chioma/foglie (replica %, gruppo %) 
+                       è diminuito rispetto al valore della misurazione precedente', NEW.n_replica, NEW.gruppo;
     END IF;
 
     IF NEW.altezza < prev_altezza
-    THEN RAISE NOTICE 'Attenzione: il valore corrispondente all''altezza della replica è diminuito rispetto al valore della misurazione precedente';
+    THEN RAISE NOTICE 'Attenzione: il valore corrispondente all''altezza (replica %, gruppo %) 
+                       è diminuito rispetto al valore della misurazione precedente', NEW.n_replica, NEW.gruppo;
     END IF;
 
     IF NEW.lunghezza_radice < prev_lunghezza_radice
-    THEN RAISE NOTICE 'Attenzione: il valore corrispondente alla lunghezza della radice è diminuito rispetto al valore della misurazione precedente';
+    THEN RAISE NOTICE 'Attenzione: il valore corrispondente alla lunghezza della radice (replica %, gruppo %) 
+                       è diminuito rispetto al valore della misurazione precedente', NEW.n_replica, NEW.gruppo;
     END IF;
 END $$
 LANGUAGE plpgsql;
