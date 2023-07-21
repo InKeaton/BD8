@@ -1,8 +1,8 @@
 
 -------------------------------------- CREAZIONE SCHEMA -----------------------------------
 
-create schema "orti1";
-set search_path to "orti1";
+create schema "orti2";
+set search_path to "orti2";
 
 
 CREATE TABLE Persona (
@@ -259,8 +259,8 @@ CREATE TABLE Misurazione (
                              PRIMARY KEY (n_rilevazione, n_replica, gruppo),
                              CHECK(modalità_mem IN ('app', 'direttamente da scheda')), -- Vincolo v16
                              CHECK(
-                             umidità >0 AND
-                             pH >0 AND
+                             umidità >=0 AND
+                             pH >=0 AND
                              perc_sup_danneggiata >=0 AND
                              n_foglie_danneggiate >=0 AND
                              n_frutti >=0 AND
@@ -332,7 +332,7 @@ EXCEPT
   UNION
   SELECT Classe.scuola
   FROM Responsabile JOIN Classe ON Responsabile.classe_nome_rappr = Classe.nome AND
- 								   Responsabile.classe_scuola_rappr = Classe.scuola )
+ 								   Responsabile.classe_scuola_rappr = Classe.scuola );
 
 /*
  determinare le specie utilizzate in tutti i comuni (provincie) in cui ci sono scuole aderenti al progetto;
@@ -344,7 +344,7 @@ FROM Studia JOIN Scuola ON Studia.scuola = Scuola.cm
 			JOIN Istituto ON Scuola.cm_i = Istituto.cm_i
 GROUP BY Studia.specie
 HAVING COUNT(DISTINCT Istituto.provincia) = (SELECT COUNT(DISTINCT provincia)
-											  FROM Istituto)
+											  FROM Istituto);
  
 
 /*
@@ -378,7 +378,7 @@ WHERE q.count >= ALL (  SELECT COUNT(*)
                                         JOIN Classe ON Responsabile.classe_nome_rappr = Classe.nome AND
                                                         Responsabile.classe_scuola_rappr = Classe.scuola
                         WHERE Classe.scuola = q.scuola
-                        GROUP BY Responsabile.id, Classe.scuola)
+                        GROUP BY Responsabile.id, Classe.scuola);
 
 
 ----------------------------------------- FUNZIONI -------------------------------------
