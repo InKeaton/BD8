@@ -1,8 +1,8 @@
 
 -------------------------------------- CREAZIONE SCHEMA -----------------------------------
 
-create schema "orti2";
-set search_path to "orti2";
+create schema "orti1";
+set search_path to "orti1";
 
 
 CREATE TABLE Persona (
@@ -93,8 +93,8 @@ CREATE TABLE Responsabile (
 CREATE TABLE Orto (
                       scuola char(8) REFERENCES Scuola (cm),
                       nome varchar(20),
-    -- Da rivedere, ora usa il formato gradi, minuti secondi
-    -- es, 41°24'12.2"N 2°10'26.5"E
+                      -- usa il formato gradi, minuti secondi
+                      -- es, 41°24'12.2"N 2°10'26.5"E
                       GPS_coord varchar(30) NOT NULL
                                             UNIQUE,
                       superficie decimal(6,0) NOT NULL,
@@ -351,9 +351,6 @@ HAVING COUNT(DISTINCT Istituto.provincia) = (SELECT COUNT(DISTINCT provincia)
  determinare per ogni scuola l’individuo/la classe della scuola che ha effettuato più rilevazioni
  */
 
---- DA RIVEDERE ---
-
-
 SELECT q.scuola, q.id
 FROM (
 	SELECT Studente.scuola, Responsabile.id, COUNT(*)
@@ -388,8 +385,6 @@ WHERE q.count >= ALL (  SELECT COUNT(*)
  nel caso di operazioni di bio-monitoraggio
  */
 
--- DA RIVEDERE --
-
 
 CREATE FUNCTION AssociaGruppi(stress integer, controllo integer) RETURNS VOID AS $$
 DECLARE
@@ -409,7 +404,7 @@ DECLARE
 
 BEGIN
 
-	/* Salva i parametri che ci interessano del gruppo sotto stress*/
+	/* Salva i parametri che ci interessano del gruppo sotto stress */
 	SELECT DISTINCT Scuola.cm_i, Gruppo.specie, Gruppo.tipo_colt, Gruppo.scopo, Orto.ambiente, COUNT(*)
 		   INTO istituto_s, specie_s, tipo_colt_s, scopo_s, ambiente_s, n_repliche_s
 	FROM Gruppo JOIN Orto ON Gruppo.orto = Orto.nome AND
@@ -418,7 +413,7 @@ BEGIN
 				JOIN Replica ON Gruppo.id = Replica.gruppo
 	WHERE Gruppo.id = stress;
 
-	/* Salva i parametri che ci interessano del gruppo di controllo*/
+	/* Salva i parametri che ci interessano del gruppo di controllo */
 	SELECT DISTINCT Scuola.cm_i, Gruppo.specie, Gruppo.tipo_colt, Gruppo.scopo, Orto.ambiente, Istituto.collabora, COUNT(*)
 		   INTO istituto_s, specie_s, tipo_colt_s, scopo_s, ambiente_s, collabora_c, n_repliche_s
 	FROM Gruppo JOIN Orto ON Gruppo.orto = Orto.nome AND
@@ -466,14 +461,15 @@ BEGIN
     THEN RAISE EXCEPTION 'I due gruppi non posseggono lo stesso numero di repliche';
     END IF;
 
-	/* Si trovano nello stesso istituto?
-       O il gruppo di controllo è in un istituto disposto a collaborare?
+	/* 
+     Si trovano nello stesso istituto?
+     O il gruppo di controllo è in un istituto disposto a collaborare?
      */
 
     IF (istituto_s != istituto_c) 
     THEN IF NOT collabora_c
-        THEN RAISE EXCEPTION 'Il gruppo di controllo % deve essere inserito nello stesso istituto 
-                              del gruppo %, o in un istituto disposto a collaborare', gruppo_controllo, gruppo_stress;
+        THEN RAISE EXCEPTION 'Il gruppo di controllo % deve trovarsi nello stesso istituto 
+                              del gruppo %, od in un istituto disposto a collaborare', gruppo_controllo, gruppo_stress;
         END IF;
     END IF;
 
