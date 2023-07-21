@@ -12,7 +12,7 @@ CREATE TABLE Persona (
                          email varchar(20) NOT NULL,
                          ruolo varchar(20) NOT NULL,
                          n_telefono numeric(11),
-                         CHECK((n_telefono IS NULL) OR (n_telefono > 0))
+                         CHECK((n_telefono IS NULL) OR (n_telefono >= 0))
 );
 
 CREATE TABLE Istituto (
@@ -41,7 +41,7 @@ CREATE TABLE Finanziamento (
 CREATE TABLE Ciclo (
                        tipo varchar(20) PRIMARY KEY,
                        ciclo varchar(10) NOT NULL,
-                       CHECK(ciclo IN ('primo', 'secondo'))
+                       CHECK(ciclo IN ('primo', 'secondo')) -- Vincolo v2
 );
 
 CREATE TABLE Scuola (
@@ -87,7 +87,7 @@ CREATE TABLE Responsabile (
                               FOREIGN KEY (classe_nome_rappr, classe_scuola_rappr)
                                   REFERENCES Classe (nome, scuola),
                               CHECK((studente_rappr IS NULL AND classe_nome_rappr IS NOT NULL AND classe_scuola_rappr IS NOT NULL)OR
-                                    (studente_rappr IS NOT NULL AND classe_nome_rappr IS NULL AND classe_scuola_rappr IS NULL))
+                                    (studente_rappr IS NOT NULL AND classe_nome_rappr IS NULL AND classe_scuola_rappr IS NULL)) -- Vincolo v19
 );
 
 CREATE TABLE Orto (
@@ -101,8 +101,8 @@ CREATE TABLE Orto (
                       tipo_colt varchar(14) NOT NULL,
                       ambiente varchar(9) NOT NULL,
                       PRIMARY KEY (scuola, nome),
-                      CHECK(tipo_colt in ('in vaso', 'in pieno campo')),
-                      CHECK(ambiente in ('pulito', 'inquinato')),
+                      CHECK(tipo_colt in ('in vaso', 'in pieno campo')), -- Vincolo v5
+                      CHECK(ambiente in ('pulito', 'inquinato')), -- Vincolo v6
                       CHECK(superficie > 0)
 );
 
@@ -123,9 +123,9 @@ CREATE TABLE UsoSpecie (
                            scopo varchar(15),
                            esposizioni varchar(17) NOT NULL,
                            PRIMARY KEY (specie, tipo_colt, scopo),
-                           CHECK(tipo_colt in ('in vaso', 'in pieno campo') ),
-                           CHECK(scopo in ('fitobonifica', 'biomonitoraggio') ),
-                           CHECK(esposizioni in ('sole','ombra','mezz''ombra','sole,mezz''ombra'))
+                           CHECK(tipo_colt in ('in vaso', 'in pieno campo') ), -- Vincolo v5
+                           CHECK(scopo in ('fitobonifica', 'biomonitoraggio') ), -- Vincolo v7  
+                           CHECK(scopo = 'biomonitoraggio' OR tipo_colt != 'in vaso') -- Vincolo v8 
 );
 
 CREATE TABLE Gruppo (
@@ -166,7 +166,7 @@ CREATE TABLE DatiSchedaArduino (
                                    micro_sd boolean NOT NULL
 );
 
-CREATE TABLE DatiSensore(
+CREATE TABLE DatiSensore (
                             n_modello char(10),
                             produttore varchar(20),
                             tipo_batteria varchar(5) NOT NULL,
@@ -175,7 +175,7 @@ CREATE TABLE DatiSensore(
                             PRIMARY KEY(n_modello, produttore)
 );
 
-CREATE TABLE Modello(
+CREATE TABLE Modello (
                         nome varchar(20) PRIMARY KEY,
                         tipo_comunicazione varchar(6) NOT NULL,
                         larghezza decimal(2,2) NOT NULL,
@@ -186,10 +186,8 @@ CREATE TABLE Modello(
                         prod_sensore varchar(20),
                         FOREIGN KEY (n_sensore, prod_sensore)
                             REFERENCES DatiSensore (n_modello, produttore),
-    -- dare nomi ai check
                         CHECK((SKU_scheda IS NULL AND n_sensore IS NOT NULL AND prod_sensore IS NOT NULL) OR
-                              (SKU_scheda IS NOT NULL AND n_sensore IS NULL AND prod_sensore IS NULL)),
-                        CHECK(tipo_comunicazione IN ('app','scheda'))
+                              (SKU_scheda IS NOT NULL AND n_sensore IS NULL AND prod_sensore IS NULL)) -- Vincolo v24
 );
 
 CREATE TABLE Rilevatore(
@@ -204,15 +202,13 @@ CREATE TABLE Rilevatore(
 
 CREATE TABLE Replica (
                          id serial,
-                         gruppo integer REFERENCES Gruppo (id), --ON CASCADE?
+                         gruppo integer REFERENCES Gruppo (id), 
                          data_piantata date NOT NULL
                              DEFAULT CURRENT_DATE,
                          esposizione varchar(15) NOT NULL,
                          rilevatore integer NOT NULL
                              REFERENCES Rilevatore(id),
-                         PRIMARY KEY (id, gruppo),
-                         CHECK(esposizione in ('sole','ombra','mezz''ombra','sole,mezz''ombra'))
-
+                         PRIMARY KEY (id, gruppo)
 );
 
 CREATE TABLE Rilevazione (
@@ -229,10 +225,10 @@ CREATE TABLE Rilevazione (
                              resp_inserimento integer REFERENCES Responsabile (id),
                              FOREIGN KEY (specie, tipo_colt, scopo)
                                  REFERENCES UsoSpecie (specie, tipo_colt, scopo),
-                             CHECK((resp_inserimento IS NULL) OR (resp_rilevazione != resp_inserimento)),
-                             CHECK(tipo_substrato IN ('terriccio da rinvaso','suolo pre-esistente')),
+                             CHECK((resp_inserimento IS NULL) OR (resp_rilevazione != resp_inserimento)), -- Vincolo v12
+                             CHECK(tipo_substrato IN ('terriccio da rinvaso','suolo pre-esistente')), -- Vincolo v14
                              CHECK((cosa_monitorato IS NULL AND (scopo = 'biomonitoraggio')) OR
-                                   ((cosa_monitorato IN ('suolo','aria')) AND (scopo = 'fitobonifica')))
+                                   ((cosa_monitorato IN ('suolo','aria')) AND (scopo = 'fitobonifica'))) -- Vincolo v11, v15
 );
 
 CREATE TABLE Misurazione (
@@ -260,7 +256,24 @@ CREATE TABLE Misurazione (
                              lunghezza_radice decimal(3,2) NOT NULL,
                              FOREIGN KEY (n_replica, gruppo)
                                  REFERENCES Replica (id, gruppo),
-                             PRIMARY KEY (n_rilevazione, n_replica, gruppo)
+                             PRIMARY KEY (n_rilevazione, n_replica, gruppo),
+                             CHECK(modalità_mem IN ('app', 'direttamente da scheda')), -- Vincolo v16
+                             CHECK(
+                             umidità >0 AND
+                             pH >0 AND
+                             perc_sup_danneggiata >=0 AND
+                             n_foglie_danneggiate >=0 AND
+                             n_frutti >=0 AND
+                             n_fiori >=0  AND
+                             lunghezza_chioma_foglie >=0 AND
+                             larghezza_chioma_foglie >=0 AND
+                             (peso_fresco_chioma_foglie >=0 OR peso_fresco_chioma_foglie IS NULL) AND
+                             peso_secco_chioma_foglie >=0 AND
+                             peso_fresco_radice >=0 AND
+                             peso_secco_radice >=0 AND
+                             altezza >=0 AND
+                             lunghezza_radice >=0
+                             AND n_replica >=0)
 );
 
 
