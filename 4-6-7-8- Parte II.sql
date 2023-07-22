@@ -9,7 +9,7 @@ CREATE TABLE Persona (
                          cf char(16) PRIMARY KEY,
                          nome varchar(20) NOT NULL,
                          cognome varchar(20) NOT NULL,
-                         email varchar(20) NOT NULL,
+                         email varchar(30) NOT NULL,
                          ruolo varchar(20) NOT NULL,
                          n_telefono numeric(11),
                          CHECK((n_telefono IS NULL) OR (n_telefono >= 0))
@@ -34,7 +34,7 @@ CREATE TABLE Finanziamento (
                                istituto char(8) PRIMARY KEY
                                    REFERENCES Istituto (cm_i),
                                progetto varchar(20) NOT NULL,
-                               entità decimal(6,2) NOT NULL,
+                               entità decimal(8,2) NOT NULL,
                                CHECK(entità>0)
 );
 
@@ -86,15 +86,15 @@ CREATE TABLE Responsabile (
                               classe_scuola_rappr char(8),
                               FOREIGN KEY (classe_nome_rappr, classe_scuola_rappr)
                                   REFERENCES Classe (nome, scuola),
-                              CHECK((studente_rappr IS NULL AND classe_nome_rappr IS NOT NULL AND classe_scuola_rappr IS NOT NULL)OR
+                              CHECK((studente_rappr IS NULL AND classe_nome_rappr IS NOT NULL AND classe_scuola_rappr IS NOT NULL) OR
                                     (studente_rappr IS NOT NULL AND classe_nome_rappr IS NULL AND classe_scuola_rappr IS NULL)) -- Vincolo v19
 );
 
 CREATE TABLE Orto (
                       scuola char(8) REFERENCES Scuola (cm),
                       nome varchar(20),
-                      -- usa il formato gradi, minuti secondi
-                      -- es, 41°24'12.2"N 2°10'26.5"E
+                      -- usa il formato gradi e minuti
+                      -- es, 50°38′N 3°03′E
                       GPS_coord varchar(30) NOT NULL
                                             UNIQUE,
                       superficie decimal(6,0) NOT NULL,
@@ -107,18 +107,18 @@ CREATE TABLE Orto (
 );
 
 CREATE TABLE Specie (
-                        nome_s varchar(20) PRIMARY KEY,
+                        nome_s varchar(30) PRIMARY KEY,
                         nome_c varchar(20) NOT NULL
 );
 
 CREATE TABLE Studia (
                         scuola char(8) REFERENCES Scuola (cm),
-                        specie varchar(20) REFERENCES Specie (nome_s),
+                        specie varchar(30) REFERENCES Specie (nome_s),
                         PRIMARY KEY (scuola, specie)
 );
 
 CREATE TABLE UsoSpecie (
-                           specie varchar(20) REFERENCES Specie (nome_s),
+                           specie varchar(30) REFERENCES Specie (nome_s),
                            tipo_colt varchar(14),
                            scopo varchar(15),
                            esposizioni varchar(17) NOT NULL,
@@ -571,7 +571,7 @@ CREATE FUNCTION massimo_3() RETURNS trigger
 AS $$
 BEGIN
 	IF (SELECT COUNT(*)
-		FROM Studia, NEW.n_replica, NEW.gruppo
+		FROM Studia
 		WHERE Studia.scuola = NEW.scuola) >= 3
 	THEN
 		RAISE EXCEPTION 'La scuola % studia già 3 specie, la tupla non può essere inserita', NEW.scuola;
