@@ -80,10 +80,10 @@ CREATE TABLE Studente(
 );
 
 CREATE TABLE Responsabile (
-                              id serial PRIMARY KEY,
                               studente_rappr char(16) REFERENCES Studente (cf),
                               classe_nome_rappr char(2),
                               classe_scuola_rappr char(8),
+                              id serial PRIMARY KEY,
                               FOREIGN KEY (classe_nome_rappr, classe_scuola_rappr)
                                   REFERENCES Classe (nome, scuola),
                               CHECK((studente_rappr IS NULL AND classe_nome_rappr IS NOT NULL AND classe_scuola_rappr IS NOT NULL) OR
@@ -391,9 +391,9 @@ DECLARE
   	istituto_s char(8);
 	istituto_c char(8);
 	collabora_c boolean;
-	specie_s varchar(20);
-	specie_c varchar(20);
-	scopo_s varchar(13);
+	specie_s varchar(30);
+	specie_c varchar(30);
+	scopo_s varchar(15);
 	scopo_c varchar(15);
 	n_repliche_s integer;
 	n_repliche_c integer;
@@ -405,17 +405,22 @@ DECLARE
 BEGIN
 
 	/* Salva i parametri che ci interessano del gruppo sotto stress */
-	SELECT DISTINCT Scuola.cm_i, Gruppo.specie, Gruppo.tipo_colt, Gruppo.scopo, Orto.ambiente, COUNT(*)
-		   INTO istituto_s, specie_s, tipo_colt_s, scopo_s, ambiente_s, n_repliche_s
+    SELECT DISTINCT Scuola.cm_i, Gruppo.specie, Gruppo.tipo_colt, Gruppo.scopo, Orto.ambiente
+           INTO istituto_s, specie_s, tipo_colt_s, scopo_s, ambiente_s
 	FROM Gruppo JOIN Orto ON Gruppo.orto = Orto.nome AND
 							 Gruppo.orto_scuola = Orto.scuola
 				JOIN Scuola ON Orto.scuola = Scuola.cm
 				JOIN Replica ON Gruppo.id = Replica.gruppo
 	WHERE Gruppo.id = stress;
 
+    SELECT COUNT(*)
+    INTO n_repliche_s
+    FROM Replica
+    WHERE gruppo = stress;
+
 	/* Salva i parametri che ci interessano del gruppo di controllo */
-	SELECT DISTINCT Scuola.cm_i, Gruppo.specie, Gruppo.tipo_colt, Gruppo.scopo, Orto.ambiente, Istituto.collabora, COUNT(*)
-		   INTO istituto_s, specie_s, tipo_colt_s, scopo_s, ambiente_s, collabora_c, n_repliche_s
+	SELECT DISTINCT Scuola.cm_i, Gruppo.specie, Gruppo.tipo_colt, Gruppo.scopo, Orto.ambiente, Istituto.collabora
+		   INTO istituto_c, specie_c, tipo_colt_c, scopo_c, ambiente_c, collabora_c
 	FROM Gruppo JOIN Orto ON Gruppo.orto = Orto.nome AND
 							 Gruppo.orto_scuola = Orto.scuola
 				JOIN Scuola ON Orto.scuola = Scuola.cm
@@ -423,16 +428,21 @@ BEGIN
 				JOIN Replica ON Gruppo.id = Replica.gruppo
 	WHERE Gruppo.id = controllo;
 
+    SELECT COUNT(*)
+    INTO n_repliche_c
+    FROM Replica
+    WHERE gruppo = controllo;
+
     /*
      Sono gruppi di biomonitoraggio?
     */
 
     IF scopo_s != 'biomonitoraggio'
-    THEN RAISE EXCEPTION 'Il gruppo % non è un gruppo di biomonitoraggio', gruppo_stress;
+    THEN RAISE EXCEPTION 'Il gruppo % non è un gruppo di biomonitoraggio', stress;
     END IF;
 
     IF scopo_c != 'biomonitoraggio'
-    THEN RAISE EXCEPTION 'Il gruppo % non è un gruppo di biomonitoraggio', gruppo_controllo;
+    THEN RAISE EXCEPTION 'Il gruppo % non è un gruppo di biomonitoraggio', controllo;
     END IF;
 
     /*
@@ -440,11 +450,11 @@ BEGIN
     */
 
     IF ambiente_s != 'inquinato'
-    THEN RAISE EXCEPTION 'Il gruppo % non è un gruppo sotto stress', gruppo_stress;
+    THEN RAISE EXCEPTION 'Il gruppo % non è un gruppo sotto stress', stress;
     END IF;
 
-    IF ambiente_s != 'pulito'
-    THEN RAISE EXCEPTION 'Il gruppo % non è un gruppo di controllo', gruppo_controllo;
+    IF ambiente_c != 'pulito'
+    THEN RAISE EXCEPTION 'Il gruppo % non è un gruppo di controllo', controllo;
     END IF;
 
     /* Sono composti da repliche della stessa specie? */
@@ -452,7 +462,7 @@ BEGIN
     IF specie_s != specie_c OR 
        tipo_colt_s != tipo_colt_c OR
        scopo_s != scopo_c
-    THEN RAISE EXCEPTION 'I due gruppi non contengono repliche appartenenti alla stessa specie';
+    THEN RAISE EXCEPTION 'I due gruppi non contengono repliche appartenenti allo stesso uso specie';
     END IF;
 
 	/* Hanno lo stesso numero di repliche? */
@@ -469,7 +479,7 @@ BEGIN
     IF (istituto_s != istituto_c) 
     THEN IF NOT collabora_c
         THEN RAISE EXCEPTION 'Il gruppo di controllo % deve trovarsi nello stesso istituto 
-                              del gruppo %, od in un istituto disposto a collaborare', gruppo_controllo, gruppo_stress;
+                              del gruppo %, od in un istituto disposto a collaborare', controllo, stress;
         END IF;
     END IF;
 
