@@ -129,7 +129,6 @@ CREATE TABLE UsoSpecie (
 );
 
 CREATE TABLE Gruppo (
-                        id serial PRIMARY KEY,
                         specie varchar(20) NOT NULL,
                         tipo_colt varchar(14) NOT NULL,
                         scopo varchar(15) NOT NULL,
@@ -137,6 +136,7 @@ CREATE TABLE Gruppo (
                         classe_scuola char(8) NOT NULL,
                         orto varchar(20) NOT NULL,
                         orto_scuola char(8) NOT NULL,
+                        id serial PRIMARY KEY,
                         FOREIGN KEY (orto, orto_scuola)
                             REFERENCES Orto (nome, scuola),
                         FOREIGN KEY (specie, tipo_colt, scopo)
@@ -170,17 +170,17 @@ CREATE TABLE DatiSensore (
                             n_modello char(10),
                             produttore varchar(20),
                             tipo_batteria varchar(5) NOT NULL,
-                            prec_luminosità decimal(4,2) NOT NULL,
-                            prec_temperatura decimal(4,2) NOT NULL,
+                            prec_luminosità decimal(6,2) NOT NULL,
+                            prec_temperatura decimal(6,2) NOT NULL,
                             PRIMARY KEY(n_modello, produttore)
 );
 
 CREATE TABLE Modello (
                         nome varchar(20) PRIMARY KEY,
-                        tipo_comunicazione varchar(6) NOT NULL,
-                        larghezza decimal(2,2) NOT NULL,
-                        lunghezza decimal(2,2) NOT NULL,
-                        altezza decimal(2,2) NOT NULL,
+                        tipo_comunicazione varchar(20) NOT NULL,
+                        larghezza decimal(4,2) NOT NULL,
+                        lunghezza decimal(4,2) NOT NULL,
+                        altezza decimal(4,2) NOT NULL,
                         SKU_scheda char(8) REFERENCES DatiSchedaArduino (SKU),
                         n_sensore char(10),
                         prod_sensore varchar(20),
@@ -191,11 +191,11 @@ CREATE TABLE Modello (
 );
 
 CREATE TABLE Rilevatore(
-                           id serial PRIMARY KEY,
                            orto varchar(20) NOT NULL,
                            scuola char(8) NOT NULL,
                            modello varchar(20) NOT NULL
                                REFERENCES Modello (nome),
+                           id serial PRIMARY KEY,
                            FOREIGN KEY (orto, scuola)
                                REFERENCES Orto (nome, scuola)
 );
@@ -212,7 +212,6 @@ CREATE TABLE Replica (
 );
 
 CREATE TABLE Rilevazione (
-                             id serial PRIMARY KEY,
                              specie varchar(20) NOT NULL,
                              tipo_colt varchar(14) NOT NULL,
                              scopo varchar(15) NOT NULL,
@@ -223,6 +222,7 @@ CREATE TABLE Rilevazione (
                              resp_rilevazione integer NOT NULL
                                  REFERENCES Responsabile (id),
                              resp_inserimento integer REFERENCES Responsabile (id),
+                             id serial PRIMARY KEY,
                              FOREIGN KEY (specie, tipo_colt, scopo)
                                  REFERENCES UsoSpecie (specie, tipo_colt, scopo),
                              CHECK((resp_inserimento IS NULL) OR (resp_rilevazione != resp_inserimento)), -- Vincolo v12
@@ -408,7 +408,7 @@ BEGIN
 	SELECT DISTINCT Scuola.cm_i, Gruppo.specie, Gruppo.tipo_colt, Gruppo.scopo, Orto.ambiente, COUNT(*)
 		   INTO istituto_s, specie_s, tipo_colt_s, scopo_s, ambiente_s, n_repliche_s
 	FROM Gruppo JOIN Orto ON Gruppo.orto = Orto.nome AND
-							 Gruppo.scuola = Orto.scuola
+							 Gruppo.orto_scuola = Orto.scuola
 				JOIN Scuola ON Orto.scuola = Scuola.cm
 				JOIN Replica ON Gruppo.id = Replica.gruppo
 	WHERE Gruppo.id = stress;
@@ -417,7 +417,7 @@ BEGIN
 	SELECT DISTINCT Scuola.cm_i, Gruppo.specie, Gruppo.tipo_colt, Gruppo.scopo, Orto.ambiente, Istituto.collabora, COUNT(*)
 		   INTO istituto_s, specie_s, tipo_colt_s, scopo_s, ambiente_s, collabora_c, n_repliche_s
 	FROM Gruppo JOIN Orto ON Gruppo.orto = Orto.nome AND
-							 Gruppo.scuola = Orto.scuola
+							 Gruppo.orto_scuola = Orto.scuola
 				JOIN Scuola ON Orto.scuola = Scuola.cm
 				JOIN Istituto ON Istituto.cm_i = Scuola.cm_i
 				JOIN Replica ON Gruppo.id = Replica.gruppo
