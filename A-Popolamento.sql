@@ -1,5 +1,7 @@
 SET search_path TO "orti1";
-SET datestyle TO "MDY";
+SET datestyle TO "DMY";
+
+----------
 
 INSERT INTO Persona VALUES('FSKCOBEOYHSOSIDC', 'Katharina','Wakefield', 'deangelo_grimes29@hotmail.com', 'referente istituto', 10863902);
 
@@ -183,12 +185,165 @@ INSERT INTO Replica VALUES(3, 5, '4-6-2023', 'sole', 2);
 
 ------
 
-SELECT AssociaGruppi(2, 1);
-SELECT AssociaGruppi(4, 3);
+INSERT INTO Responsabile VALUES (NULL, '4B', 'V1KUI1V0');
+INSERT INTO Responsabile VALUES (NULL, '1C', 'NDWJA38M');
+INSERT INTO Responsabile VALUES (NULL, '2A', 'V2QEWUZ2');
+INSERT INTO Responsabile VALUES (NULL, '3G', 'EM9H32SX');
+INSERT INTO Responsabile VALUES ('S3ADQ81UOBBZPMJM');
+INSERT INTO Responsabile VALUES ('3A80V9KHMK764YAT');
+INSERT INTO Responsabile VALUES ('CXX41A77ZJCDW4QG');
+INSERT INTO Responsabile VALUES ('RQMOLMA2XZKVPWK6');
 
 ------
 
-INSERT INTO Responsabile VALUES()
+INSERT INTO Rilevazione VALUES ('Cucumis Sativus L.', 'in pieno campo', 'biomonitoraggio', 
+								 '10-6-2023 12:00:00', 'suolo pre-esistente', NULL, 1);
+INSERT INTO Rilevazione VALUES ('Cucumis Sativus L.', 'in pieno campo', 'biomonitoraggio', 
+								 '11-6-2023 12:00:00', 'suolo pre-esistente', NULL, 5, 1);
+INSERT INTO Rilevazione VALUES ('Cucumis Sativus L.', 'in pieno campo', 'biomonitoraggio', 
+								 '9-6-2023 12:00:00', 'terriccio da rinvaso', NULL, 5);
+								 
+INSERT INTO Rilevazione VALUES ('Cucumis Sativus L.', 'in pieno campo', 'biomonitoraggio', 
+								 '22-6-2023 12:00:00', 'terriccio da rinvaso', NULL, 2);
+INSERT INTO Rilevazione VALUES ('Cucumis Sativus L.', 'in pieno campo', 'biomonitoraggio', 
+								 '15-6-2023 12:00:00', 'terriccio da rinvaso', NULL, 2);
+INSERT INTO Rilevazione VALUES ('Cucumis Sativus L.', 'in pieno campo', 'biomonitoraggio', 
+								 '18-6-2023 12:00:00', 'suolo pre-esistente', NULL, 6);
+								 
+INSERT INTO Rilevazione VALUES ('Brassica napus L.', 'in vaso', 'biomonitoraggio', 
+								 '12-6-2023 12:00:00', 'terriccio da rinvaso', NULL, 3);
+INSERT INTO Rilevazione VALUES ('Brassica napus L.', 'in vaso', 'biomonitoraggio', 
+								 '14-6-2023 12:00:00', 'terriccio da rinvaso', NULL, 7);
+INSERT INTO Rilevazione VALUES ('Brassica napus L.', 'in vaso', 'biomonitoraggio', 
+								 '14-6-2023 12:00:00', 'suolo pre-esistente', NULL, 7);
+					
+INSERT INTO Rilevazione VALUES ('Brassica napus L.', 'in vaso', 'biomonitoraggio', 
+								 '15-6-2023 12:00:00', 'suolo pre-esistente', NULL, 4);
+INSERT INTO Rilevazione VALUES ('Brassica napus L.', 'in vaso', 'biomonitoraggio', 
+								 '18-6-2023 12:00:00', 'terriccio da rinvaso', NULL, 8);
+		
+INSERT INTO Rilevazione VALUES ('Lavandula sp. pl.', 'in pieno campo', 'fitobonifica', 
+								 '21-6-2023 12:00:00', 'suolo pre-esistente', 'suolo', 4); 
+INSERT INTO Rilevazione VALUES ('Lavandula sp. pl.', 'in pieno campo', 'fitobonifica', 
+								 '23-6-2023 12:00:00', 'suolo pre-esistente', 'suolo', 4); 
+INSERT INTO Rilevazione VALUES ('Lavandula sp. pl.', 'in pieno campo', 'fitobonifica', 
+								 '26-6-2023 12:00:00', 'suolo pre-esistente', 'suolo', 4); 
+-- controllare vincolo su cosa monitorato
+							
+-----------								 
+
+INSERT INTO Misurazione VALUES (1, 1, 1, '9-7-2023 10:00:00', 'app', 24, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+INSERT INTO Misurazione VALUES (2, 1, 1, '10-7-2023 10:00:00', 'app', 24, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+INSERT INTO Misurazione VALUES (3, 1, 1, '7-7-2023 10:00:00', 'app', 24, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+INSERT INTO Misurazione VALUES (4, 1, 1, '12-7-2023 10:00:00', 'app', 24, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+INSERT INTO Misurazione VALUES (5, 1, 1, '11-7-2023 10:00:00', 'app', 24, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+INSERT INTO Misurazione VALUES (6, 1, 1, '13-7-2023 10:00:00', 'app', 14, 34, 67, 78, 3, 4, 4,
+							    31, 10, 11, 34, 38, 68, 20, 35);
+								
+INSERT INTO Misurazione VALUES (1, 2, 1, '9-7-2023 10:00:00', 'app', 24, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+INSERT INTO Misurazione VALUES (2, 2, 1, '10-7-2023 10:00:00', 'direttamente da scheda', 24, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+INSERT INTO Misurazione VALUES (3, 2, 1, '7-7-2023 10:00:00', 'app', 24, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+INSERT INTO Misurazione VALUES (4, 2, 1, '12-7-2023 10:00:00', 'app', 24, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+INSERT INTO Misurazione VALUES (5, 2, 1, '11-7-2023 10:00:00', 'app', 24, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+INSERT INTO Misurazione VALUES (6, 2, 1, '13-7-2023 10:00:00', 'app', 14, 34, 67, 78, 3, 4, 4,
+							    31, 10, 11, 34, 38, 68, 20, 35);
+
+INSERT INTO Misurazione VALUES (1, 1, 2, '9-7-2023 10:00:00', 'app', 24, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+INSERT INTO Misurazione VALUES (2, 1, 2, '10-7-2023 10:00:00', 'app', 24, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+INSERT INTO Misurazione VALUES (3, 1, 2, '7-7-2023 10:00:00', 'app', 24, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+INSERT INTO Misurazione VALUES (4, 1, 2, '12-7-2023 10:00:00', 'app', 24, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+INSERT INTO Misurazione VALUES (5, 1, 2, '11-7-2023 10:00:00', 'app', 24, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+INSERT INTO Misurazione VALUES (6, 1, 2, '13-7-2023 10:00:00', 'app', 14, 34, 67, 78, 3, 4, 4,
+							    31, 10, 11, 34, 38, 68, 20, 35);
+
+INSERT INTO Misurazione VALUES (1, 2, 2, '9-7-2023 10:00:00', 'app', 24, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+INSERT INTO Misurazione VALUES (2, 2, 2, '10-7-2023 10:00:00', 'app', 24, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+INSERT INTO Misurazione VALUES (3, 2, 2, '7-7-2023 10:00:00', 'app', 24, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+INSERT INTO Misurazione VALUES (4, 2, 2, '12-7-2023 10:00:00', 'app', 24, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+INSERT INTO Misurazione VALUES (5, 2, 2, '11-7-2023 10:00:00', 'app', 24, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+INSERT INTO Misurazione VALUES (6, 2, 2, '13-7-2023 10:00:00', 'app', 14, 34, 67, 78, 3, 4, 4,
+							    31, 10, 11, 34, 38, 68, 20, 35);
+								
+INSERT INTO Misurazione VALUES (7, 1, 3, '9-7-2023 10:00:00', 'app', 44, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+INSERT INTO Misurazione VALUES (8, 1, 3, '10-7-2023 10:00:00', 'app', 24, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+INSERT INTO Misurazione VALUES (9, 1, 3, '7-7-2023 10:00:00', 'app', 64, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+INSERT INTO Misurazione VALUES (10, 1, 3, '12-7-2023 10:00:00', 'app', 24, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+INSERT INTO Misurazione VALUES (11, 1, 3, '11-7-2023 10:00:00', 'app', 25, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+
+INSERT INTO Misurazione VALUES (7, 1, 4, '9-7-2023 10:00:00', 'app', 64, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+INSERT INTO Misurazione VALUES (8, 1, 4, '10-7-2023 10:00:00', 'app', 24, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+INSERT INTO Misurazione VALUES (9, 1, 4, '7-7-2023 10:00:00', 'app', 34, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+INSERT INTO Misurazione VALUES (10, 1, 4, '12-7-2023 10:00:00', 'app', 24, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+INSERT INTO Misurazione VALUES (11, 1, 4, '11-7-2023 10:00:00', 'app', 44, 18, 7, 10, 1, 0, 0,
+							    30, 10, 9, 19, 39, 78, 30, 5);
+
+INSERT INTO Misurazione VALUES (13, 2, 5, '11-7-2023 10:00:00', 'app', 20, 20, 20, 20, 20, 20, 20,
+							    20, 20, 20, 20, 20, 20, 20, 20);
+INSERT INTO Misurazione VALUES (12, 2, 5, '13-7-2023 10:00:00', 'app', 10, 10, 10, 10, 10, 10, 10,
+							    10, 10, 10, 10, 10, 10, 10, 10);
+
+
+								
+INSERT INTO Misurazione VALUES (12, 1, 5, '11-7-2023 10:00:00', 'app', 10, 10, 10, 10, 10, 10, 10,
+							    10, 10, 10, 10, 10, 10, 10, 10);
+INSERT INTO Misurazione VALUES (13, 1, 5, '15-7-2023 10:00:00', 'app', 20, 20, 20, 20, 20, 20, 20,
+							    20, 20, 20, 20, 20, 20, 20, 20);
+INSERT INTO Misurazione VALUES (14, 1, 5, '17-7-2023 10:00:00', 'app', 50, 50, 50, 50, 50, 50, 50,
+							    50, 50, 50, 50, 50, 50, 50, 50);
+
+INSERT INTO Misurazione VALUES (12, 3, 5, '13-7-2023 10:00:00', 'app', 10, 10, 10, 10, 10, 10, 10,
+							    10, 10, 10, 10, 10, 10, 10, 10);
+INSERT INTO Misurazione VALUES (13, 3, 5, '11-7-2023 10:00:00', 'app', 20, 20, 20, 20, 20, 20, 20,
+							    20, 20, 20, 20, 20, 20, 20, 20);
+INSERT INTO Misurazione VALUES (14, 3, 5, '13-7-2023 10:00:00', 'app', 10, 10, 10, 10, 10, 10, 10,
+							    10, 10, 10, 10, 10, 10, 10, 10);
+
+								
+-------
+
+SELECT AssociaGruppi(2, 1);
+SELECT AssociaGruppi(4, 3);
+
+-------
+
+
+
+
+
+
+
+
+
+
 
 
 

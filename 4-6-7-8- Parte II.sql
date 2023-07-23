@@ -227,8 +227,9 @@ CREATE TABLE Rilevazione (
                                  REFERENCES UsoSpecie (specie, tipo_colt, scopo),
                              CHECK((resp_inserimento IS NULL) OR (resp_rilevazione != resp_inserimento)), -- Vincolo v12
                              CHECK(tipo_substrato IN ('terriccio da rinvaso','suolo pre-esistente')), -- Vincolo v14
+                             CHECK(cosa_monitorato IN ('suolo','aria')), -- Vincolo v15
                              CHECK((cosa_monitorato IS NULL AND (scopo = 'biomonitoraggio')) OR
-                                   ((cosa_monitorato IN ('suolo','aria')) AND (scopo = 'fitobonifica'))) -- Vincolo v11, v15
+                                   (cosa_monitorato IS NOT NULL AND (scopo = 'fitobonifica'))) -- Vincolo v11
 );
 
 CREATE TABLE Misurazione (
@@ -238,22 +239,22 @@ CREATE TABLE Misurazione (
                              gruppo integer NOT NULL,
                              timestamp_misurazione timestamp NOT NULL
                                  DEFAULT CURRENT_TIMESTAMP,
-                             modalità_mem varchar(20) NOT NULL,
-                             temperatura decimal(2,2) NOT NULL,
-                             umidità decimal(2,2) NOT NULL,
-                             pH decimal(2,1) NOT NULL,
-                             perc_sup_danneggiata decimal (2,0) NOT NULL,
+                             modalità_mem varchar(22) NOT NULL,
+                             temperatura decimal(4,2) NOT NULL,
+                             umidità decimal(4,2) NOT NULL,
+                             pH decimal(3,1) NOT NULL,
+                             perc_sup_danneggiata decimal (2) NOT NULL,
                              n_foglie_danneggiate decimal(3) NOT NULL,
                              n_frutti decimal(3) NOT NULL,
                              n_fiori decimal(3) NOT NULL,
-                             lunghezza_chioma_foglie decimal(3,2) NOT NULL,
-                             larghezza_chioma_foglie decimal(3,2) NOT NULL,
-                             peso_fresco_chioma_foglie decimal(3,2),
-                             peso_secco_chioma_foglie decimal(3,2) NOT NULL,
-                             peso_fresco_radice decimal(3,2) NOT NULL,
-                             peso_secco_radice decimal(3,2) NOT NULL,
-                             altezza decimal(3,2) NOT NULL,
-                             lunghezza_radice decimal(3,2) NOT NULL,
+                             lunghezza_chioma_foglie decimal(5,2) NOT NULL,
+                             larghezza_chioma_foglie decimal(5,2) NOT NULL,
+                             peso_fresco_chioma_foglie decimal(5,2),
+                             peso_secco_chioma_foglie decimal(5,2) NOT NULL,
+                             peso_fresco_radice decimal(5,2) NOT NULL,
+                             peso_secco_radice decimal(5,2) NOT NULL,
+                             altezza decimal(5,2) NOT NULL,
+                             lunghezza_radice decimal(5,2) NOT NULL,
                              FOREIGN KEY (n_replica, gruppo)
                                  REFERENCES Replica (id, gruppo),
                              PRIMARY KEY (n_rilevazione, n_replica, gruppo),
@@ -272,8 +273,7 @@ CREATE TABLE Misurazione (
                              peso_fresco_radice >=0 AND
                              peso_secco_radice >=0 AND
                              altezza >=0 AND
-                             lunghezza_radice >=0
-                             AND n_replica >=0)
+                             lunghezza_radice >=0)
 );
 
 
@@ -502,7 +502,7 @@ LANGUAGE plpgsql;
 
 
 CREATE FUNCTION ValoriMediFra_Fitobonifica(replica integer,
-										   gruppo integer,
+										   replica_gruppo integer,
 										   data_in date,
 										   data_fin date)
 RETURNS TABLE (temperatura_media decimal,
@@ -540,9 +540,9 @@ BEGIN
 						AVG(X.lunghezza_radice)
 				  FROM Misurazione AS X
 				  WHERE  X.n_replica = replica AND
-						 X.gruppo = gruppo AND
+						 X.gruppo = replica_gruppo AND
 						 date(X.timestamp_misurazione) >= data_in AND
-						 date(X.timestamp_misurazione) < data_in;
+						 date(X.timestamp_misurazione) < data_fin;
 
 END $$
 LANGUAGE plpgsql;
@@ -608,12 +608,12 @@ EXECUTE FUNCTION massimo_3();
 CREATE FUNCTION check_decrease_biomassa() RETURNS trigger
 AS $$
     DECLARE
-        prev_lunghezza_chioma_foglie decimal(3,2);
-        prev_larghezza_chioma_foglie decimal(3,2);
-        prev_peso_fresco_chioma_foglie decimal(3,2);
-        prev_peso_secco_chioma_foglie decimal(3,2);
-        prev_altezza decimal(3,2);
-        prev_lunghezza_radice decimal(3,2);
+        prev_lunghezza_chioma_foglie decimal(5,2);
+        prev_larghezza_chioma_foglie decimal(5,2);
+        prev_peso_fresco_chioma_foglie decimal(5,2);
+        prev_peso_secco_chioma_foglie decimal(5,2);
+        prev_altezza decimal(5,2);
+        prev_lunghezza_radice decimal(5,2);
 BEGIN
     /* 
      Dovrebbe inserire nelle variabili i dati della prima tupla riportata, 
@@ -624,38 +624,50 @@ BEGIN
         INTO  prev_lunghezza_chioma_foglie,  prev_larghezza_chioma_foglie,  prev_peso_fresco_chioma_foglie,
             prev_peso_secco_chioma_foglie,  prev_altezza,  prev_lunghezza_radice
     FROM misurazione
-    WHERE misurazione.n_replica = NEW.n_replica
+    WHERE misurazione.n_replica = NEW.n_replica AND
+          misurazione.gruppo = NEW.gruppo
     ORDER BY misurazione.timestamp_misurazione DESC;
 
-    IF NEW.lunghezza_chioma_foglie < prev_lunghezza_chioma_foglie 
-    THEN RAISE NOTICE 'Attenzione: il valore corrispondente alla lunghezza chioma/foglie (replica %, gruppo %) 
-                       è diminuito rispetto al valore della misurazione precedente', NEW.n_replica, NEW.gruppo;
+    /* 
+     Se quella inserita è la prima tupla, anche i valori obbligatori sono nulli. Ne 
+     Scegliamo uno per verificare se questo è il caso
+     */
+    IF prev_lunghezza_chioma_foglie IS NOT NULL
+    THEN
+        IF NEW.lunghezza_chioma_foglie < prev_lunghezza_chioma_foglie 
+        THEN RAISE NOTICE 'Attenzione: il valore corrispondente alla lunghezza chioma/foglie (replica %, gruppo %) 
+                        è diminuito rispetto al valore della misurazione precedente', NEW.n_replica, NEW.gruppo;
+        END IF;
+
+        IF NEW.larghezza_chioma_foglie < prev_larghezza_chioma_foglie
+        THEN RAISE NOTICE 'Attenzione: il valore corrispondente alla larghezza chioma/foglie (replica %, gruppo %) 
+                        è diminuito rispetto al valore della misurazione precedente', NEW.n_replica, NEW.gruppo;
+        END IF;
+
+        IF prev_peso_fresco_chioma_foglie IS NOT NULL THEN
+            IF NEW.peso_fresco_chioma_foglie < prev_peso_fresco_chioma_foglie
+            THEN RAISE NOTICE 'Attenzione: il valore corrispondente al peso fresco chioma/foglie (replica %, gruppo %) 
+                            è diminuito rispetto al valore della misurazione precedente', NEW.n_replica, NEW.gruppo;
+            END IF;
+        END IF;
+
+        IF NEW.peso_secco_chioma_foglie < prev_peso_secco_chioma_foglie
+        THEN RAISE NOTICE 'Attenzione: il valore corrispondente al peso secco chioma/foglie (replica %, gruppo %) 
+                        è diminuito rispetto al valore della misurazione precedente', NEW.n_replica, NEW.gruppo;
+        END IF;
+
+        IF NEW.altezza < prev_altezza
+        THEN RAISE NOTICE 'Attenzione: il valore corrispondente all''altezza (replica %, gruppo %) 
+                        è diminuito rispetto al valore della misurazione precedente', NEW.n_replica, NEW.gruppo;
+        END IF;
+
+        IF NEW.lunghezza_radice < prev_lunghezza_radice
+        THEN RAISE NOTICE 'Attenzione: il valore corrispondente alla lunghezza della radice (replica %, gruppo %) 
+                        è diminuito rispetto al valore della misurazione precedente', NEW.n_replica, NEW.gruppo;
+        END IF;
     END IF;
 
-    IF NEW.larghezza_chioma_foglie < prev_larghezza_chioma_foglie
-    THEN RAISE NOTICE 'Attenzione: il valore corrispondente alla larghezza chioma/foglie (replica %, gruppo %) 
-                       è diminuito rispetto al valore della misurazione precedente', NEW.n_replica, NEW.gruppo;
-    END IF;
-
-    IF NEW.peso_fresco_chioma_foglie < prev_peso_fresco_chioma_foglie
-    THEN RAISE NOTICE 'Attenzione: il valore corrispondente al peso fresco chioma/foglie (replica %, gruppo %) 
-                       è diminuito rispetto al valore della misurazione precedente', NEW.n_replica, NEW.gruppo;
-    END IF;
-
-    IF NEW.peso_secco_chioma_foglie < prev_peso_secco_chioma_foglie
-    THEN RAISE NOTICE 'Attenzione: il valore corrispondente al peso secco chioma/foglie (replica %, gruppo %) 
-                       è diminuito rispetto al valore della misurazione precedente', NEW.n_replica, NEW.gruppo;
-    END IF;
-
-    IF NEW.altezza < prev_altezza
-    THEN RAISE NOTICE 'Attenzione: il valore corrispondente all''altezza (replica %, gruppo %) 
-                       è diminuito rispetto al valore della misurazione precedente', NEW.n_replica, NEW.gruppo;
-    END IF;
-
-    IF NEW.lunghezza_radice < prev_lunghezza_radice
-    THEN RAISE NOTICE 'Attenzione: il valore corrispondente alla lunghezza della radice (replica %, gruppo %) 
-                       è diminuito rispetto al valore della misurazione precedente', NEW.n_replica, NEW.gruppo;
-    END IF;
+    RETURN NEW;
 END $$
 LANGUAGE plpgsql;
 
