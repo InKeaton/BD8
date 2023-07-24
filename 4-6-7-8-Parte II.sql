@@ -1,9 +1,14 @@
 
--------------------------------------- CREAZIONE SCHEMA -----------------------------------
-
 create schema "orti1";
 set search_path to "orti1";
 
+-------------------------------------- CREAZIONE SCHEMA -----------------------------------
+
+/*
+ Alcuni attributi potrebbero avere un ordine od un nome differente rispetto al progetto
+ logico. Questo avviene per comodità, e si ritiene che i rispettivi attributi siano
+ facilmente identificabili
+*/
 
 CREATE TABLE Persona (
                          cf char(16) PRIMARY KEY,
@@ -410,12 +415,11 @@ DECLARE
 BEGIN
 
 	/* Salva i parametri che ci interessano del gruppo sotto stress */
-    SELECT DISTINCT Scuola.cm_i, Gruppo.specie, Gruppo.tipo_colt, Gruppo.scopo, Orto.ambiente
+    SELECT Scuola.cm_i, Gruppo.specie, Gruppo.tipo_colt, Gruppo.scopo, Orto.ambiente
            INTO istituto_s, specie_s, tipo_colt_s, scopo_s, ambiente_s
 	FROM Gruppo JOIN Orto ON Gruppo.orto = Orto.nome AND
 							 Gruppo.orto_scuola = Orto.scuola
 				JOIN Scuola ON Orto.scuola = Scuola.cm
-				JOIN Replica ON Gruppo.id = Replica.gruppo
 	WHERE Gruppo.id = stress;
 
     SELECT COUNT(*)
@@ -424,13 +428,12 @@ BEGIN
     WHERE gruppo = stress;
 
 	/* Salva i parametri che ci interessano del gruppo di controllo */
-	SELECT DISTINCT Scuola.cm_i, Gruppo.specie, Gruppo.tipo_colt, Gruppo.scopo, Orto.ambiente, Istituto.collabora
+	SELECT Scuola.cm_i, Gruppo.specie, Gruppo.tipo_colt, Gruppo.scopo, Orto.ambiente, Istituto.collabora
 		   INTO istituto_c, specie_c, tipo_colt_c, scopo_c, ambiente_c, collabora_c
 	FROM Gruppo JOIN Orto ON Gruppo.orto = Orto.nome AND
 							 Gruppo.orto_scuola = Orto.scuola
 				JOIN Scuola ON Orto.scuola = Scuola.cm
 				JOIN Istituto ON Istituto.cm_i = Scuola.cm_i
-				JOIN Replica ON Gruppo.id = Replica.gruppo
 	WHERE Gruppo.id = controllo;
 
     SELECT COUNT(*)
