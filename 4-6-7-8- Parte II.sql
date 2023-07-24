@@ -569,7 +569,6 @@ BEGIN
 	THEN
 		RAISE EXCEPTION 'Il gruppo % ha già 20 repliche. La replica non può essere inserita', NEW.gruppo;
 	ELSE
-		RAISE NOTICE 'Replica inserita correttamente nel gruppo % con numero %', NEW.gruppo, NEW.id;
 		RETURN NEW;
 	END IF;
 END $$
@@ -591,7 +590,6 @@ BEGIN
 	THEN
 		RAISE EXCEPTION 'La scuola % studia già 3 specie, la tupla non può essere inserita', NEW.scuola;
 	ELSE
-		RAISE NOTICE 'Tupla inserita correttamente: % studia anche %', NEW.scuola, NEW.specie;
 		RETURN NEW;
 	END IF;
 END $$
@@ -624,13 +622,26 @@ BEGIN
      Dovrebbe inserire nelle variabili i dati della prima tupla riportata, 
      ovvero la misurazione più recente
      */
-    SELECT lunghezza_chioma_foglie, larghezza_chioma_foglie, peso_fresco_chioma_foglie,
+    SELECT lunghezza_chioma_foglie, larghezza_chioma_foglie,
            peso_secco_chioma_foglie, altezza, lunghezza_radice
-        INTO  prev_lunghezza_chioma_foglie,  prev_larghezza_chioma_foglie,  prev_peso_fresco_chioma_foglie,
+        INTO  prev_lunghezza_chioma_foglie,  prev_larghezza_chioma_foglie,
             prev_peso_secco_chioma_foglie,  prev_altezza,  prev_lunghezza_radice
     FROM misurazione
     WHERE misurazione.n_replica = NEW.n_replica AND
           misurazione.gruppo = NEW.gruppo
+    ORDER BY misurazione.timestamp_misurazione DESC;
+
+    /* 
+     Siccome il valore peso_fresco_chioma_foglie può essere nullo, cerchiamo 
+     separatamente il suo ultimo valore registrato
+     */
+
+    SELECT peso_fresco_chioma_foglie
+        INTO prev_peso_fresco_chioma_foglie
+    FROM misurazione
+    WHERE misurazione.n_replica = NEW.n_replica AND
+          misurazione.gruppo = NEW.gruppo AND
+          misurazione.peso_fresco_chioma_foglie IS NOT NULL
     ORDER BY misurazione.timestamp_misurazione DESC;
 
     /* 
@@ -649,8 +660,8 @@ BEGIN
                         è diminuito rispetto al valore della misurazione precedente', NEW.n_replica, NEW.gruppo;
         END IF;
 
-        IF prev_peso_fresco_chioma_foglie IS NOT NULL THEN
-            IF NEW.peso_fresco_chioma_foglie < prev_peso_fresco_chioma_foglie
+        IF (prev_peso_fresco_chioma_foglie IS NOT NULL) AND (NEW.peso_fresco_chioma_foglie IS NOT NULL)
+        THEN IF NEW.peso_fresco_chioma_foglie < prev_peso_fresco_chioma_foglie
             THEN RAISE NOTICE 'Attenzione: il valore corrispondente al peso fresco chioma/foglie (replica %, gruppo %) 
                             è diminuito rispetto al valore della misurazione precedente', NEW.n_replica, NEW.gruppo;
             END IF;

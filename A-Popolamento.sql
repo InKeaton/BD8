@@ -1,7 +1,14 @@
 SET search_path TO "orti1";
 SET datestyle TO "DMY";
 
-----------
+------------------------------------------ POPOLAMENTO --------------------------------------------------
+-------------------------------------------- MANUALE ----------------------------------------------------
+
+/*
+ Il seguente popolamento è stato realizzato manualmente solo per testare il codice realizzato.
+ Per tal motivo, potrebbe non rispettare alcuni dei vincoli trigger non implementati
+ */
+
 
 INSERT INTO Persona VALUES('FSKCOBEOYHSOSIDC', 'Katharina','Wakefield', 'deangelo_grimes29@hotmail.com', 'referente istituto', 10863902);
 

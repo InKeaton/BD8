@@ -1,4 +1,6 @@
 
+SET search_path TO "orti1";
+
 ---------------------------------------- CARICO DI LAVORO -----------------------------------------
 
 /*
@@ -29,9 +31,8 @@ WHERE nome = 'John';
 
 ---------------------------------------- SCHEMA FISICO -----------------------------------------
 
-/*
- 1.
- */
+
+-- 1.
 
 CREATE INDEX finanziamento_entità
 ON Finanziamento (entità);
@@ -42,9 +43,8 @@ USING finanziamento_entità;
 /* BEFORE : SEQ SCAN */
 /* AFTER : INDEX SCAN */
 
-/*
- 2.
- */
+
+-- 2.
 
 /*
  * INDICE HASH
@@ -71,9 +71,9 @@ USING persona_nome;
 
 
 
-/*
- 3.
- */
+
+-- 3.
+
 
 /*
  Non è stata necessaria alcuna modifica allo schema fisico della base di dati per effettuare 
@@ -92,70 +92,77 @@ CREATE ROLE ReferenteScuola;
 CREATE ROLE ReferenteIstituto;
 CREATE ROLE GestoreGlobaleDelProgetto;
 
+GRANT USAGE ON SCHEMA orti1 TO Studente;
+GRANT USAGE ON SCHEMA orti1 TO Docente;
+GRANT USAGE ON SCHEMA orti1 TO ReferenteScuola;
+GRANT USAGE ON SCHEMA orti1 TO ReferenteIstituto;
+GRANT USAGE ON SCHEMA orti1 TO GestoreGlobaleDelProgetto;
 
 /*
  Privilegi di SELECT a Studente 
  */
 
 GRANT SELECT
-ON AssociatoA,
-Classe,
-DatiSchedaArduino,
-DatiSensore,
-Gruppo,
-Misurazione,
-Modello,
-Orto,
-Replica,
-Responsabile,
-Rilevatore,
-Rilevazione,
-Scuola,
-Specie,
-Studente,
-Studia,
-UsoSpecie
+ON orti1.AssociatoA,
+orti1.Classe,
+orti1.DatiSchedaArduino,
+orti1.DatiSensore,
+orti1.Gruppo,
+orti1.Misurazione,
+orti1.Modello,
+orti1.Orto,
+orti1.Replica,
+orti1.Responsabile,
+orti1.Rilevatore,
+orti1.Rilevazione,
+orti1.Scuola,
+orti1.Specie,
+orti1.Studente,
+orti1.Studia,
+orti1.UsoSpecie
 TO Studente;
 
 /*
  Privilegi di SELECT a ReferenteScuola, GestoreGlobale
  */
 
-
 GRANT SELECT ON 
-associatoa,
-replica,
-rilevazione,
-misurazione,
-gruppo,
-responsabile,
-rilevatore,
-studente,
-classe,
-orto,
-studia,
-ciclo,
-finanziamento,
-referentescuola,
-scuola,
-datischedaarduino,
-datisensore,
-istituto,
-specie,
-usospeci,
-modello,
-persona
-TO ReferenteScuola,GestoreGlobaleDelProgetto
+orti1.associatoa,
+orti1.replica,
+orti1.rilevazione,
+orti1.misurazione,
+orti1.gruppo,
+orti1.responsabile,
+orti1.rilevatore,
+orti1.studente,
+orti1.classe,
+orti1.orto,
+orti1.studia,
+orti1.ciclo,
+orti1.finanziamento,
+orti1.referentescuola,
+orti1.referenteistituto,
+orti1.scuola,
+orti1.datischedaarduino,
+orti1.datisensore,
+orti1.istituto,
+orti1.specie,
+orti1.usospecie,
+orti1.modello,
+orti1.persona
+TO ReferenteScuola,GestoreGlobaleDelProgetto;
 
 /*
  Privilegi di INSERT a Studente 
  */
+GRANT USAGE ON SEQUENCE orti1.responsabile_id_seq TO studente;
+GRANT USAGE ON SEQUENCE orti1.rilevazione_id_seq TO studente;
 
 GRANT INSERT
 ON 
-Misurazione,
-Responsabile,
-Rilevazione
+orti1.Misurazione,
+orti1.Responsabile,
+orti1.Rilevazione
 TO Studente;
 
 /*
@@ -168,17 +175,22 @@ GRANT Studente to Docente;
 /*
  Privilegi completi a Docente 
  */
- 
+GRANT USAGE ON SEQUENCE orti1.gruppo_id_seq TO docente;
+GRANT USAGE ON SEQUENCE orti1.replica_id_seq TO docente;
+GRANT USAGE ON SEQUENCE orti1.responsabile_id_seq TO docente;
+GRANT USAGE ON SEQUENCE orti1.rilevazione_id_seq TO docente;
+GRANT USAGE ON SEQUENCE orti1.rilevatore_id_seq TO docente;
+
 GRANT ALL PRIVILEGES
 ON 
-AssociatoA,
-Gruppo,
-Misurazione,
-Replica,
-Responsabile,
-Rilevatore,
-Rilevazione,
-Studente
+orti1.AssociatoA,
+orti1.Gruppo,
+orti1.Misurazione,
+orti1.Replica,
+orti1.Responsabile,
+orti1.Rilevatore,
+orti1.Rilevazione,
+orti1.Studente
 TO Docente;
 
 /*
@@ -187,9 +199,9 @@ TO Docente;
 
 GRANT SELECT
 ON
-Istituto,
-Persona,
-ReferenteScuola
+orti1.Istituto,
+orti1.Persona,
+orti1.ReferenteScuola
 TO Docente;
 
 /*
@@ -198,9 +210,9 @@ TO Docente;
 
 GRANT ALL PRIVILEGES
 ON 
-Classe,
-Orto,
-Studia
+orti1.Classe,
+orti1.Orto,
+orti1.Studia
 TO ReferenteScuola;
 
 /*
@@ -209,10 +221,10 @@ TO ReferenteScuola;
 
 GRANT ALL PRIVILEGES
 ON 
-Ciclo,
-Finanziamento,
-ReferenteScuola,
-Scuola
+orti1.Ciclo,
+orti1.Finanziamento,
+orti1.ReferenteScuola,
+orti1.Scuola
 TO ReferenteIstituto;
 
 /*
@@ -221,32 +233,32 @@ TO ReferenteIstituto;
 
 GRANT ALL PRIVILEGES
 ON 
-DatiSchedaArduino,
-DatiSensore,
-Istituto,
-Modello,
-Persona,
-ReferenteIstituto, 
-Specie,
-UsoSpecie
+orti1.DatiSchedaArduino,
+orti1.DatiSensore,
+orti1.Istituto,
+orti1.Modello,
+orti1.Persona,
+orti1.ReferenteIstituto, 
+orti1.Specie,
+orti1.UsoSpecie
 TO ReferenteIstituto;
 
 /*
  creazione utenti ed assegnazione ruoli
 */
 
-CREATE USER alice PASSWORD'alice';
+CREATE USER alice PASSWORD 'alice';
 GRANT Studente to alice;
 
-CREATE USER bob PASSWORD'bob';
+CREATE USER bob PASSWORD 'bob';
 GRANT Docente to bob;
 
-CREATE USER carl PASSWORD'carl';
+CREATE USER carl PASSWORD 'carl';
 GRANT ReferenteScuola to carl;
 
-CREATE USER dennis PASSWORD'dennis';
+CREATE USER dennis PASSWORD 'dennis';
 GRANT ReferenteIstituto to dennis;
 
-CREATE USER edward PASSWORD'edward';
+CREATE USER edward PASSWORD 'edward';
 GRANT GestoreGlobaleDelProgetto to edward;
 

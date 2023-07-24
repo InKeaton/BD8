@@ -19,7 +19,8 @@ ADD COLUMN dummy_s char(100) DEFAULT 'e1J4OHwP2Fi0sdHviov7dMvgisyDYJWm5qbjNBx1hP
 ALTER TABLE ReferenteScuola
 ADD COLUMN dummy_r char(100) DEFAULT 'e1J4OHwP2Fi0sdHviov7dMvgisyDYJWm5qbjNBx1hPjnlkLBXwDKyj77XQIEV5SOtxf7uRwuGWl7bCmadVKhdaOBaTLSVeSw98He';
 
------------------------------------------- POPOLAMENTO ----------------------------------------------------
+------------------------------------------ POPOLAMENTO -----------------------------------------------------
+----------------------------------------- CON DATANAMIC ----------------------------------------------------
 
 INSERT INTO "orti1"."ciclo" ("tipo","ciclo") VALUES ('jKWJxs57bNMQITJ','secondo');
 INSERT INTO "orti1"."ciclo" ("tipo","ciclo") VALUES ('eD63o7N','secondo');
